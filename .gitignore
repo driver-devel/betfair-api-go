@@ -1,0 +1,25 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Intellij generated files
+/.idea
+
+# Emacs generated files
+.dir-locals.el
+.#*
+.projectile
+\#*#
+
+# Vim generated files
+*.swp
+
+
+# Project specific ignored files
+*.test
+betfair_test.go

@@ -1,0 +1,29 @@
+package betfair
+
+import (
+	"crypto/tls"
+	"log"
+)
+
+var testCert = `
+`
+
+var testKey = `
+`
+
+func init() {
+	certificate, err := tls.X509KeyPair([]byte(testCert), []byte(testKey))
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	testAccount = Account{
+		Username:       "",
+		Password:       "",
+		ApplicationKey: "",
+		Certificate:    certificate,
+		LoginMethod:    NoneInteractive,
+		KeepAlive:      false,
+	}
+}
