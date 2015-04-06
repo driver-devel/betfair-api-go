@@ -28,11 +28,11 @@ type TimeRange struct {
 
 type MarketFilter struct {
 	TextQuery          string     `json:"textQuery,omitempty"`
-	ExchangeIds        []string   `json:"exchangeIds,omitempty"`
-	EventTypeIds       []string   `json:"eventTypeIds,omitempty"`
-	EventIds           []string   `json:"eventIds,omitempty"`
-	CompetitionIds     []string   `json:"competitionIds,omitempty"`
-	MarketIds          []string   `json:"marketIds,omitempty"`
+	ExchangeIDs        []string   `json:"exchangeIds,omitempty"`
+	EventTypeIDs       []string   `json:"eventTypeIds,omitempty"`
+	EventIDs           []string   `json:"eventIds,omitempty"`
+	CompetitionIDs     []string   `json:"competitionIds,omitempty"`
+	MarketIDs          []string   `json:"marketIds,omitempty"`
 	Venues             []string   `json:"venues,omitempty"`
 	BspOnly            *bool      `json:"bspOnly,omitempty"`
 	TurnInPlayEnabled  *bool      `json:"turnInPlayEnabled,omitempty"`
