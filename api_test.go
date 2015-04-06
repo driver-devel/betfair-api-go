@@ -1,6 +1,9 @@
 package betfair
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func getTestAPI() *API {
 	return NewAPI(GetTestSession())
@@ -8,7 +11,7 @@ func getTestAPI() *API {
 
 func TestEventTypes(t *testing.T) {
 	var api = getTestAPI()
-	eventTypes, err := api.ListEventTypes(Options{})
+	eventTypes, err := api.ListEventTypes(Options{"filter": MarketFilter{EventTypeIds: []int64{1}}})
 
 	if err != nil {
 		t.Error(err)
@@ -40,7 +43,10 @@ func TestCompetitions(t *testing.T) {
 func TestEvents(t *testing.T) {
 	var api = getTestAPI()
 
-	events, err := api.ListEvents(Options{"exchange": "au"})
+	from := time.Now()
+	to := from.Add(time.Hour * 24)
+
+	events, err := api.ListEvents(Options{"exchange": "au", "filter": MarketFilter{MarketStartTime: &TimeRange{From: from, To: to}}})
 
 	if err != nil {
 		t.Error(err)
