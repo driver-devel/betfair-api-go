@@ -11,7 +11,7 @@ func getTestAPI() *API {
 
 func TestEventTypes(t *testing.T) {
 	var api = getTestAPI()
-	eventTypes, err := api.ListEventTypes(Options{"filter": MarketFilter{EventTypeIds: []int64{1}}})
+	eventTypes, err := api.ListEventTypes(Options{"filter": MarketFilter{EventTypeIds: []string{"1"}}})
 
 	if err != nil {
 		t.Error(err)
