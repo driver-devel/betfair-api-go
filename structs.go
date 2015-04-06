@@ -154,7 +154,7 @@ type MarketCatalogue struct {
 	MarketName      string             `json:"marketName"`
 	MarketStartTime string             `json:"marketStartTime"`
 	Description     *MarketDescription `json:"description"`
-	Runners         []RunnerCatalogue  `json:"runnerCatalogue"`
+	Runners         []RunnerCatalogue  `json:"runners"`
 	TotalMatched    float64            `json:"totalMatched"`
 	EventType       *EventType         `json:"eventType"`
 	Competition     *Competition       `json:"competition"`

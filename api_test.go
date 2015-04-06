@@ -94,7 +94,7 @@ func TestVenues(t *testing.T) {
 func TestMarketCatalogue(t *testing.T) {
 	var api = getTestAPI()
 
-	markets, err := api.ListMarketCatalogue(Options{"maxResults": 1})
+	markets, err := api.ListMarketCatalogue(Options{"maxResults": 5, "marketProjection": []string{"RUNNER_METADATA"}})
 
 	if err != nil {
 		t.Error(err)
