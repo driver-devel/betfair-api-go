@@ -46,7 +46,7 @@ func TestEvents(t *testing.T) {
 	from := time.Now()
 	to := from.Add(time.Hour * 24)
 
-	events, err := api.ListEvents(Options{"exchange": "au", "filter": MarketFilter{MarketStartTime: &TimeRange{From: from, To: to}}})
+	events, err := api.ListEvents(Options{"exchange": "uk", "filter": MarketFilter{MarketStartTime: &TimeRange{From: from, To: to}}})
 
 	if err != nil {
 		t.Error(err)
@@ -56,6 +56,18 @@ func TestEvents(t *testing.T) {
 	if len(events) == 0 {
 		t.Error("Could not get any event")
 		return
+	}
+
+	for _, e := range events {
+		go func(event EventResult) {
+			eventTypes, err := api.ListEventTypes(Options{"filter": MarketFilter{EventIDs: []string{event.Event.ID}}})
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			t.Logf("eventTypes count: %d", len(eventTypes))
+		}(e)
 	}
 }
 

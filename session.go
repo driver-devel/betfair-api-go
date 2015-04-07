@@ -16,14 +16,56 @@ import (
 )
 
 // Call betfair api timeoout
-// 10 seconds by default
 var ClientTimeout = time.Second * 10
 
+// Maximum of parallel requests per session
+var HTTPClientPoolSize = 100
+
+// Login betfair endpoint
 var InteractiveLoginEndpoint = "https://identitysso-api.betfair.com/api/login"
+
+// Certificate login method endpoint
 var NonInteractiveLoginEndpoint = "https://identitysso-api.betfair.com/api/certlogin"
+
+// Keep session token alive endpoint
 var KeepAliveEndpoint = "https://identitysso.betfair.com/api/keepAlive"
 
-func initializeHTTPClient(account *Account) (*http.Client, error) {
+type pooledHTTPClient struct {
+	*http.Client
+	poolCh chan bool
+}
+
+func (client *pooledHTTPClient) Do(req *http.Request) ([]byte, error) {
+	client.checkoutConnection()
+	defer client.releaseConnection()
+
+	res, err := client.Client.Do(req)
+
+	defer res.Body.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.ReadAll(res.Body)
+}
+
+func (client *pooledHTTPClient) checkoutConnection() {
+	<-client.poolCh
+}
+
+func (client *pooledHTTPClient) releaseConnection() {
+	client.poolCh <- true
+}
+
+func initializeHTTPClient(account *Account) (*pooledHTTPClient, error) {
+	pool := make(chan bool, HTTPClientPoolSize)
+
+	// fill pool with values
+	for i := 0; i < HTTPClientPoolSize; i++ {
+		pool <- true
+	}
+
 	if account.LoginMethod == NoneInteractive {
 		ssl := &tls.Config{
 			Certificates:       []tls.Certificate{account.Certificate},
@@ -41,7 +83,7 @@ func initializeHTTPClient(account *Account) (*http.Client, error) {
 			},
 		}
 
-		return httpClient, nil
+		return &pooledHTTPClient{httpClient, pool}, nil
 	}
 
 	var httpClient = &http.Client{
@@ -52,14 +94,13 @@ func initializeHTTPClient(account *Account) (*http.Client, error) {
 		},
 	}
 
-	return httpClient, nil
-
+	return &pooledHTTPClient{httpClient, pool}, nil
 }
 
 type Session struct {
 	ssoid      string
 	account    *Account
-	httpClient *http.Client
+	httpClient *pooledHTTPClient
 	m          sync.Mutex
 }
 
@@ -147,21 +188,7 @@ func (session *Session) doRawRequest(httpMethod, endpoint string, body io.Reader
 
 	req.Header.Set("X-Authentication", token)
 
-	res, err := session.httpClient.Do(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	resBody, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resBody, nil
+	return session.httpClient.Do(req)
 }
 
 func (session *Session) startKeepAliveLoop() error {
@@ -183,19 +210,11 @@ func (session *Session) requestSsoid() (string, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Application", session.account.ApplicationKey)
 
-	res, err := session.httpClient.Do(req)
+	resBody, err := session.httpClient.Do(req)
 
 	if err != nil {
 		return "", err
 	}
-
-	resBody, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return "", err
-	}
-
-	res.Body.Close()
 
 	if session.account.LoginMethod == Interactive {
 		var response = InteractiveSessionResponse{}
