@@ -26,6 +26,7 @@ const (
 	listEvents          = "SportsAPING/v1.0/listEvents"
 	listCountries       = "SportsAPING/v1.0/listCountries"
 	listVenues          = "SportsAPING/v1.0/listVenues"
+	listMarketTypes     = "SportsAPING/v1.0/listMarketTypes"
 	listMarketCatalogue = "SportsAPING/v1.0/listMarketCatalogue"
 	listMarketBook      = "SportsAPING/v1.0/listMarketBook"
 	listCurrentOrders   = "SportsAPING/v1.0/listCurrentOrders"
@@ -87,6 +88,15 @@ func (api *API) ListMarketCatalogue(options Options) (result []MarketCatalogue, 
 	}
 
 	err = api.doRequest(listMarketCatalogue, &result, extendOptions(catalogueDefaultOptions, options))
+	return result, err
+}
+
+func (api *API) ListMarketTypes(options Options) (result []MarketTypeResult, err error) {
+	var listMarketTypesOptions = Options{
+		"filter": MarketFilter{},
+	}
+
+	err = api.doRequest(listMarketTypes, &result, extendOptions(listMarketTypesOptions, options))
 	return result, err
 }
 

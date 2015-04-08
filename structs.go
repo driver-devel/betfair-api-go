@@ -123,6 +123,11 @@ type VenueResult struct {
 	Venue       string `json:"venue"`
 }
 
+type MarketTypeResult struct {
+	MarketType  string `json:"marketType"`
+	MarketCount int64  `json:"marketCount"`
+}
+
 type MarketDescription struct {
 	PersistenceEnabled bool    `json:"persistenceEnabled"`
 	BspMarket          bool    `json:"bspMarket"`

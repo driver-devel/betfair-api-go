@@ -103,6 +103,22 @@ func TestVenues(t *testing.T) {
 	}
 }
 
+func TestMarketTypes(t *testing.T) {
+	var api = getTestAPI()
+
+	marketTypes, err := api.ListMarketTypes(Options{})
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(marketTypes) == 0 {
+		t.Error("Could not get any market type")
+		return
+	}
+}
+
 func TestMarketCatalogue(t *testing.T) {
 	var api = getTestAPI()
 
