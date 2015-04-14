@@ -57,18 +57,6 @@ func TestEvents(t *testing.T) {
 		t.Error("Could not get any event")
 		return
 	}
-
-	for _, e := range events {
-		go func(event EventResult) {
-			eventTypes, err := api.ListEventTypes(Options{"filter": MarketFilter{EventIDs: []string{event.Event.ID}}})
-
-			if err != nil {
-				t.Error(err)
-			}
-
-			t.Logf("eventTypes count: %d", len(eventTypes))
-		}(e)
-	}
 }
 
 func TestCountries(t *testing.T) {
@@ -193,6 +181,31 @@ func BenchmarkEventTypes(t *testing.B) {
 
 	if len(eventTypes) == 0 {
 		t.Error("Could not get any event type")
+		return
+	}
+}
+
+func BenchmarkMarketBook(t *testing.B) {
+	var api = getTestAPI()
+
+	markets, err := api.ListMarketCatalogue(Options{"maxResults": 10, "exchange": "au"})
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var market = markets[0]
+
+	outcomes, err := api.ListMarketBook([]string{market.MarketID}, Options{"exchange": "au"})
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(outcomes) == 0 {
+		t.Error("Could not get market book")
 		return
 	}
 }
